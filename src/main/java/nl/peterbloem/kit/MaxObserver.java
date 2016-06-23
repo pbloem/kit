@@ -10,6 +10,10 @@ import java.util.RandomAccess;
 /**
  * Maintains a list of the top k largest elements seen.
  * 
+ * Note: if the elements to be observed are in a list already, use the 
+ * static quickselect method below. It's much faster. The MaxObserver is good
+ * for large collections, elements coming in online, and conserving memory. 
+ * 
  * @author Peter
  *
  */

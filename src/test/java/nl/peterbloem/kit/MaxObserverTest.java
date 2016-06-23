@@ -117,11 +117,11 @@ public class MaxObserverTest
 		MaxObserver<Integer> obs = new MaxObserver<Integer>(k);
 			obs.observe(list);
 		System.out.println("Max observer finished in " + Functions.toc() + " seconds.");
-		System.out.println("maxobserver result " + obs.elements(false));
+		// System.out.println("maxobserver result " + obs.elements(false));
 		
 		Functions.tic();
 		List<Integer> elements = MaxObserver.quickSelect(k, list, comp, false);
 		System.out.println("QuickSelect finished in " + Functions.toc() + " seconds.");
-		System.out.println("quickselect result " + elements);
+		// System.out.println("quickselect result " + elements);
 	}
 }

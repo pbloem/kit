@@ -183,7 +183,7 @@ public class BitStringTest {
 	{
 		for(BitString mask : BitString.all(5))
 		{
-			System.out.println(mask);
+			// System.out.println(mask);
 		}
 	}
 }
