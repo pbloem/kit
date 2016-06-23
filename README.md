@@ -35,7 +35,8 @@ model.print(System.out);
 
 ## Installation
 
-The simplest way to use kit is through [JitPack](https://jitpack.io/#pbloem/kit). Add the following repository:
+The simplest way to use kit is as a maven module, with 
+[JitPack](https://jitpack.io/#pbloem/kit). Add the following repository:
 
 ```xml
 	<repositories>
