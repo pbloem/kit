@@ -1089,4 +1089,139 @@ public class Functions
 		
 		return Pair.p(Math.min(x, y), Math.max(x, y));
 	}
+	
+    private static double[] uniform(int n)
+    {
+    	double[] res = new double[n];
+    	for(int i : series(n))
+    		res[i] = 1.0/n;
+    	
+    	return res;
+    }
+   
+
+    /**
+     * Sorts both lists by the corresponding values in V.
+     *
+     * @param things
+     * @param values
+     */
+    public static <T, V> void sort(List<T> things, List<V> values, final Comparator<V> comp)
+    {   
+        class Comp implements Comparator<Pair<T, V>>
+        {
+			@Override
+			public int compare(Pair<T, V> a, Pair<T, V> b)
+			{
+				return comp.compare(a.second(), b.second());
+			}
+        }
+        
+        int n = things.size();
+        assert(things.size() == values.size());
+        
+        List<Pair<T, V>> pairs = new ArrayList<Pair<T, V>>(n);
+        for(int i : series(n))
+        	pairs.add(new Pair<T, V>(things.get(i), values.get(i)));
+        
+        Collections.sort(pairs, new Comp());
+        
+        things.clear();
+        values.clear();
+        
+        for(Pair<T, V> pair : pairs)
+        {
+        	things.add(pair.first());
+        	values.add(pair.second());
+        }
+    }
+    
+    /**
+     * Sorts all lists (including the values) by the corresponding values in 'values'.
+     *
+     * if the values have equal order, the elements are sorted by the first list 
+     * that contains elements comparable to one another. This behavior is 
+     * ill-defined due to problems with generics. 
+     *
+     * @param things
+     * @param values
+     */
+    public static <V> void sort(final List<V> values, final Comparator<V> comp, final List... lists)
+    {   
+    	int n = values.size();
+    	for(int i : series(lists.length))
+    		if(lists[i].size() != n)
+    			throw new IllegalArgumentException("List "+i+" has size "+lists[i].size() +", but values has size "+ values.size()+". All lists should have the same size.");
+    	
+    	class Tuple
+    	{
+    		V value;
+    		Object[] things;
+    		
+    		public Tuple(int i)
+    		{
+    			value = values.get(i);
+    			
+    			things = new Object[lists.length];
+    			for(int j : series(lists.length))
+    				things[j] = lists[j].get(i);
+    		}
+    		
+    		public V value(){return value;}
+    		public Object thing(int j){return things[j];}
+    	}
+    	
+        class Comp implements Comparator<Tuple>
+        {
+			@Override
+			public int compare(Tuple a, Tuple b)
+			{
+				int vcomp = comp.compare(a.value(), b.value());
+				
+				if(vcomp != 0)
+					return vcomp;
+				
+				for(int j : series(lists.length))
+				{
+					Object oa = a.thing(j);
+					Object ob = b.thing(j);
+					
+					if(oa instanceof Comparable<?>)
+					{
+						Comparable ca = (Comparable)oa;
+						
+						try {
+							int comp = ca.compareTo(ob);
+							if(comp != 0)
+								return comp;
+						} catch (Exception e)
+						{
+							// no problem, move on 
+						}
+					}	
+				}
+				
+				return 0;
+			}
+        }
+                
+        List<Tuple> tuples = new ArrayList<Tuple>(values.size());
+        for(int i : series(values.size()))
+        	tuples.add(new Tuple(i));
+        
+        Collections.sort(tuples, new Comp());
+        
+        values.clear();
+        for(int j : series(lists.length))
+        	lists[j].clear();
+        
+        for(Tuple tuple : tuples)
+        {
+        	values.add(tuple.value());
+
+            for(int j : series(lists.length))
+            	(lists[j]).add(tuple.thing(j));
+        }
+    }
+    
 }
