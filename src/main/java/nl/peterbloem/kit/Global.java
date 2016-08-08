@@ -75,4 +75,25 @@ public class Global
 	 */
 	public static Logger log() { return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME); }
 	
+	private static int numThreads = Runtime.getRuntime().availableProcessors();
+	
+	/**
+	 * Suggestion for the number of threads to use. Set to 
+	 * Runtime.getRuntime().availableProcessors() by default.
+	 * 
+	 * @return
+	 */
+	public static int numThreads()
+	{
+		return numThreads;
+	}
+	
+	/**
+	 * Set the suggested number of threads.
+	 * @return
+	 */
+	public static void setNumThreads(int numThreads)
+	{
+		Global.numThreads = numThreads;
+	}
 }
