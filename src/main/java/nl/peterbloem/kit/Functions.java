@@ -1223,5 +1223,40 @@ public class Functions
             	(lists[j]).add(tuple.thing(j));
         }
     }
+
+    public static int sumInts(Collection<Integer> numbers)
+    {
+    	int res = 0;
+    	for(Integer v : numbers)
+    		res += v;
+    	
+    	return res;
+    }
     
+    public static long sumLongs(Collection<Long> numbers)
+    {
+    	long res = 0;
+    	for(Long v : numbers)
+    		res += v;
+    	
+    	return res;
+    }    
+    
+    public static float sumFloats(Collection<Float> numbers)
+    {
+    	float res = 0;
+    	for(Float v : numbers)
+    		res += v;
+    	
+    	return res;
+    }  
+    
+    public static double sum(Collection<? extends Number> numbers)
+    {
+    	double res = 0;
+    	for(Number v : numbers)
+    		res += v.doubleValue();
+    	
+    	return res;
+    } 
 }
