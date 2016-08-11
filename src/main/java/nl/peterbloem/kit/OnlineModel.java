@@ -1,6 +1,8 @@
 package nl.peterbloem.kit;
 
 import static nl.peterbloem.kit.Functions.log2;
+import static org.apache.commons.math3.special.Gamma.digamma;
+import static org.apache.commons.math3.special.Gamma.logGamma;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -8,7 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A KT estimator for observing and encoding a sequence of tokens.
+ * A KT estimator (or Dirichlet-Multinomial model) for observing and encoding 
+ * a sequence of tokens.
  * 
  * Put simply, this encoder keeps a running model, encoding each symbol observed 
  * with its current model, and then updating the model. 
@@ -57,8 +60,6 @@ public class OnlineModel<T> extends FrequencyModel<T>
 		add(symbol, 0.0);
 	}
 	
-	
-	
 	@Override
 	public void add(T token)
 	{
@@ -87,6 +88,59 @@ public class OnlineModel<T> extends FrequencyModel<T>
 		add(symbol);
 		
 		return p;
+	}
+	
+	/**
+	 * The same as observe, but returns -log2 of the probability (the number of 
+	 * bits required) to encode the symbol under the KT estimator.
+	 * 
+	 * Saferr for small probabilities.
+	 * 
+	 * @param symbol
+	 * @return
+	 */
+	public double encode(T symbol)
+	{
+		if(distinct() == 0.0)
+			return Double.NaN;
+			
+		double num = log2(frequency(symbol) + smoothing); 
+		double den = log2(total() + smoothing * distinct());
+		
+		double bits = - (num - den);
+		
+		add(symbol);
+		
+		return bits;
+	}
+
+	/**
+	 * Behaves as 'freq' separate calls to encode(symbol)
+	 * @param symbol
+	 * @param freq
+	 * @return
+	 */
+	public double encode(T symbol, int freq)
+	{
+		if(freq < 1)
+			throw new IllegalArgumentException("Frequency must be 1 or larger (was "+freq+")");
+		if(freq == 1)
+			return encode(symbol);
+		
+		if(! super.frequencies.keySet().contains(symbol))
+		{
+			double p = encode(symbol);
+			return p + encode(symbol, freq - 1);
+		}
+		
+		double a = frequency(symbol) + smoothing;
+		double b = total() + smoothing * distinct();
+
+		double bits = - log2Product(a, b, freq - 1);
+		
+		add(symbol, freq);
+		
+		return bits;
 	}
 	
 	@Override
@@ -146,7 +200,7 @@ public class OnlineModel<T> extends FrequencyModel<T>
 		
 		double bits = 0.0;
 		for(L symbol : sequence)
-			bits += - Functions.log2(model.observe(symbol)); 
+			bits += - log2(model.observe(symbol)); 
 		
 		return bits;
 	}
@@ -168,6 +222,23 @@ public class OnlineModel<T> extends FrequencyModel<T>
 			bits += -Functions.log2(model.probability(symbol));
 		
 		return bits;
+	}
+	
+	/**
+	 * Computes the product <pre>\prod_{i = 0}^k \frac{a+i}{b+i}</pre> quickly 
+	 * 
+	 * @param a
+	 * @param b
+	 * @param k
+	 * @return
+	 */
+	public static double log2Product(double a, double b, int k)
+	{
+		double logNum =  logGamma(b) + logGamma(a + (double)k + 1.0);
+		double logDen = logGamma(a) + logGamma(b + (double)k + 1.0);
+		double res = logNum - logDen;
+		
+		return res / Math.log(2.0);
 	}
 
 }
