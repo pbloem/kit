@@ -162,7 +162,7 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	}
 	
 	/**
-	 * This uses an online model to store a sequence of (positive) integers, assuming that 
+	 * This uses an online model to store a sequence of (nonnegativ) integers, assuming that 
 	 * the maximum value and length of the sequence are known. 
 	 * @param sequence
 	 * @return

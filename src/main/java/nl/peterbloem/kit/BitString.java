@@ -372,7 +372,7 @@ public class BitString extends AbstractList<Boolean> implements Serializable
 	{
 		BitString out = BitString.zeros(size);
 		
-		for(int i : Functions.sample(ones, size))
+		for(int i : Functions.sampleInts(ones, size))
 			out.set(i, true);
 		
 		return out;

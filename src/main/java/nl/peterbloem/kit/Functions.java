@@ -514,7 +514,7 @@ public class Functions
 		else
 			list = new ArrayList<T>(collection);
 		
-		List<Integer> indices = sample(num, list.size());
+		List<Integer> indices = sampleInts(num, list.size());
 		Collections.sort(indices);
 		
 		List<T> result = new ArrayList<T>(num);
@@ -593,7 +593,40 @@ public class Functions
 	 * @return A uniform random choice from all sets of size k of distinct 
 	 * 	integers below the 'size' parameter. The result is not sorted.
 	 */
-	public static List<Integer> sample(int k, int size)
+	public static List<Long> sample(int k, long size)
+	{
+		if(0 > k || k > size)
+			throw new IllegalArgumentException("Argument k ("+k+") must be non-negative and smaller than size ("+size+")");
+		// * The algorithm we use basically simulates having an array with the 
+		//   values of 0 to n - 1 at their own indices, and for each i, choosing
+		//   a random index above it and swapping the two entries.
+		//
+		//   Since we expect low k, most entries in this array will stay at 
+		//   their original index and we only stores the values that deviate.
+		
+		Map<Long, Long> map = new HashMap<Long, Long>();
+				
+		for(long i : series(k))
+		{
+			// Sample a random integer above or equal to i and below 'size'
+			long draw = randomLong(size - i) + i;
+			
+			long drawValue = map.containsKey(draw) ? map.get(draw) : draw;
+			long iValue = map.containsKey(i) ? map.get(i) : i; 
+			
+			// swap the values
+			map.put(i, drawValue);
+			map.put(draw, iValue);
+		}
+		
+		List<Long> result = new ArrayList<Long>(k);
+		for(int i : series(k))
+			result.add(map.get(i));
+		
+		return result;
+	}
+	
+	public static List<Integer> sampleInts(int k, int size)
 	{
 		if(0 > k || k > size)
 			throw new IllegalArgumentException("Argument k ("+k+") must be non-negative and smaller than size ("+size+")");
@@ -624,6 +657,26 @@ public class Functions
 			result.add(map.get(i));
 		
 		return result;
+	}
+	
+	/**
+	 * Source http://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
+	 * @param rng
+	 * @param n
+	 * @return
+	 */
+	public static long randomLong( long n) 
+	{
+		   // error checking and 2^x checking removed for simplicity.
+		   long bits, val;
+		   
+		   do 
+		   {
+		      bits = (Global.random().nextLong() << 1) >>> 1;
+		      val = bits % n;
+		   } while (bits-val+(n-1) < 0L);
+		   
+		   return val;
 	}
 
 	private static final double LN2 = Math.log(2.0);
