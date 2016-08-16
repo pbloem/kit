@@ -620,7 +620,7 @@ public class Functions
 		}
 		
 		List<Long> result = new ArrayList<Long>(k);
-		for(int i : series(k))
+		for(long i : series(k))
 			result.add(map.get(i));
 		
 		return result;
