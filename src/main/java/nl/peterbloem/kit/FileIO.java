@@ -187,4 +187,18 @@ public class FileIO {
 		return string.substring(prefix.length());
 	}
 	
+	/**
+	 * Delete the given file/directory, and everything in it.
+	 * 
+	 * @param file
+	 */
+	public static void rDelete(File file)
+	{
+		if(file.isDirectory())
+			for(File sub : file.listFiles())
+				rDelete(sub);
+		
+		file.delete();
+	}
+	
 }
