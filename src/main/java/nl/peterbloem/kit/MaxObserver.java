@@ -146,13 +146,14 @@ public class MaxObserver<T>
 	}
 	
 	/**
-	 * Returns 
+	 * Selects the 'k' smallest elements in the list (by the given comparator),
+	 * ie. the elements that would come first if we were to sort the list. 
 	 * 
 	 * @param k
 	 * @param in
 	 * @param comp
 	 * @param copy If true, the original list is copied. If false, the original list is used,
-	 *   and the order will be changed.
+	 *   and its ordering will be changed.
 	 * @return
 	 */
 	public static <T> List<T> quickSelect(int k, List<T> in, Comparator<T> comp, boolean copy)
