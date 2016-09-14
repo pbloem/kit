@@ -79,7 +79,7 @@ public class Functions
 		return logFactorial(n) / LN2;
 	}
 	
-	public static double logFactorial(int n, double base)
+	public static double logFactorial(long n, double base)
 	{
 		return logFactorial(n) / Math.log(base);
 	}
@@ -91,7 +91,7 @@ public class Functions
 	 * @param n
 	 * @return
 	 */
-	public static double logFactorial(int n)
+	public static double logFactorial(long n)
 	{
 		if(n < 0)
 			throw new IllegalArgumentException("Factorial not defined for negative values("+n+")");
@@ -107,7 +107,7 @@ public class Functions
 		}			
 		
 		if (n <= factCache) 
-			return Math.log(factorials[n]);
+			return Math.log(factorials[(int)n]);
 		else 
 			return logGamma(n + 1.0);
 	}
@@ -1118,7 +1118,7 @@ public class Functions
       1985,701,1879,1221,849,627,1465,789,543,1187,1591,923,1905,979,1241,181
     };
 
-	public static double prefix(int n)
+	public static double prefix(long n)
 	{
 		double prob = 1.0/ ((n + 1.0)*(n + 2.0));
 		return - log2(prob);
