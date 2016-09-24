@@ -279,25 +279,26 @@ public class Functions
 		return result;
 	}
 	
-	private static long ticTime = -1;
+	private static ThreadLocal<Long> ticTime = new ThreadLocal<Long>();
 	public static void tic()
 	{
-		ticTime = System.currentTimeMillis();
+		ticTime.set(System.nanoTime());
 	}
 	
 	/** 
 	 * Returns the number of seconds since tic was last called. <br/>
 	 * <br/>
-	 * Not thread-safe (at all).
+	 * The behavior of tic()/toc() is thread-local, so different threads
+	 * can call this function simultaneously.
 	 * 
 	 * @return A double representing the number of seconds since the last call 
 	 *         to tic(). 
 	 */
 	public static double toc()
 	{
-		if(ticTime  < 0)
+		if(ticTime.get()  == null)
 			throw new IllegalStateException("Tic has not been called yet");
-		return (System.currentTimeMillis() - ticTime)/1000.0;
+		return (System.nanoTime() - ticTime.get()) * 10E-9;
 	}
 
 	/**
