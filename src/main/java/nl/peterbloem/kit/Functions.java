@@ -73,7 +73,7 @@ public class Functions
 		return -tmp + Math.log(2.5066282746310005 * ser / x);
 	}
 
-	public static double log2Factorial(int n)
+	public static double log2Factorial(long n)
 	{
 		final double LN2 = Math.log(2.0); 
 		return logFactorial(n) / LN2;
@@ -86,7 +86,7 @@ public class Functions
 	
 	
 	/**
-	 * Calculates the naturallog of the factorial of an integer n. Uses gamma
+	 * Calculates the natural log of the factorial of an integer n. Uses gamma
 	 * functions for n > 100;
 	 * @param n
 	 * @return
@@ -113,7 +113,7 @@ public class Functions
 	}
 	
 	/**
-	 * Calculates the log of the factorial of a double n. Uses gamma
+	 * Calculates the natural log of the factorial of a double n. Uses gamma
 	 * functions.
 	 * @param n 
 	 * @return
@@ -325,7 +325,7 @@ public class Functions
 	}	
 	
 	/**
-	 * The binary logarithm of the choose function (ie. the binomial coefficient)
+	 * The natural logarithm of the choose function (ie. the binomial coefficient)
 	 */
 	public static double logChoose(double sub, double total)
 	{
