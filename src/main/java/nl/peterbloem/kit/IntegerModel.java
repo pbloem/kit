@@ -13,66 +13,38 @@ import java.util.Set;
 
 /**
  * A KT estimator (or Dirichlet-Multinomial model) for observing and encoding 
- * a sequence of tokens.
- * 
- * Put simply, this encoder keeps a running model, encoding each symbol observed 
- * with its current model, and then updating the model. 
- * 
- * This model requires a record of all symbols that will be observed (the 
- * collection used in the constructor) before symbols are observed. If these are
- * not available in a collection and performance is important, the following 
- * approach is equivalent
- * <pre>
- *   OnlineModel model = new OnlineModel(Collections.emptyList());
- * 
- *   for(T symbol : ...)
- *   {
- *   	model.add(symbol, 0.0);
- *   }
- *   
- *   // start observing
- * </pre>
- * 
- * Note that if this pattern is used, the user MUST ensure that all tokens are 
- * added before observe is called for the first time.
- * 
- * TODO: Check that something like model.add("x", 15.3) still works.
- * 
+ * a sequence of nonnegative integers. Integer-specific version of the OnlineModel
+
  * @author Peter
  *
  * @param <T>
  */
-public class OnlineModel<T> extends FrequencyModel<T>
+public class IntegerModel extends FrequencyModel<Integer>
 {
 	private double smoothing = 0.5;
-	
-	public OnlineModel(Collection<T> symbols)
-	{
-		for(T symbol : symbols)
-			add(symbol, 0.0);
-	}
+	private int max;
 	
 	/**
-	 * Adds a symbol to the dictionary without incrementing any frequencies
 	 * 
-	 * @param symbol
+	 * @param max Maximum integer we can encounter
 	 */
-	public void addToken(T symbol)
+	public IntegerModel(int max)
 	{
-		add(symbol, 0.0);
+		this.max = max;
 	}
 	
 	@Override
-	public void add(T token)
+	public void add(Integer token)
 	{
-		if((! frequencies.containsKey(token)) && started())
-			throw new IllegalStateException("Observations have started, no new symbols can be added (Attempted to add symbol "+token+").");
-		
+		if(token > max)
+			throw new IllegalArgumentException("Input ("+token+") larger than max ("+max+").");
+			
 		super.add(token);
 	}
 
-	public OnlineModel(double smoothing)
+	public IntegerModel(double smoothing, int max)
 	{
+		this(max);
 		this.smoothing = smoothing;
 	}
 	
@@ -83,7 +55,7 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	 * @return The probability of the given symbol according to the current model
 	 * as it is before the symbol is added. 
 	 */
-	public double observe(T symbol)
+	public double observe(Integer symbol)
 	{
 		double p = probability(symbol);
 		
@@ -96,12 +68,12 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	 * The same as observe, but returns -log2 of the probability (the number of 
 	 * bits required) to encode the symbol under the KT estimator.
 	 * 
-	 * Saferr for small probabilities.
+	 * Safer for small probabilities.
 	 * 
 	 * @param symbol
 	 * @return
 	 */
-	public double encode(T symbol)
+	public double encode(Integer symbol)
 	{
 		if(distinct() == 0.0)
 			return Double.NaN;
@@ -122,7 +94,7 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	 * @param freq
 	 * @return
 	 */
-	public double encode(T symbol, int freq)
+	public double encode(Integer symbol, int freq)
 	{
 		if(freq < 1)
 			throw new IllegalArgumentException("Frequency must be 1 or larger (was "+freq+")");
@@ -146,37 +118,34 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	}
 	
 	@Override
-	public double probability(T symbol)
+	public double probability(Integer symbol)
 	{
-		if(distinct() == 0.0)
-			return Double.NaN;
+		if(symbol < 0 || symbol > max)
+			throw new IllegalArgumentException("Input ("+symbol+") outside of legal range (0, "+max+")");
 			
 		return (frequency(symbol) + smoothing) / (total() + smoothing * distinct());
-	}
+	}	
 	
-	/**
-	 * Whether observations have started (in which case no new symbols may be added).
-	 * @return
-	 */
-	public boolean started()
+	@Override
+	public double distinct()
 	{
-		return total() > 0.0;
+		return max + 1;
 	}
-	
+
 	/**
-	 * This uses an online model to store a sequence of (nonnegativ) integers, assuming that 
+	 * This uses an online model to store a sequence of (nonnegative) integers, assuming that 
 	 * the maximum value and length of the sequence are known. 
 	 * @param sequence
 	 * @return
 	 */
-	public static double storeIntegers(List<Integer> sequence)
+	public static double store(List<Integer> sequence)
 	{
 		if(sequence.isEmpty())
 			return 0.0;
 		
 		int max = Functions.max(sequence);
 		
-		OnlineModel<Integer> model = new OnlineModel<Integer>(Series.series(max + 1));
+		IntegerModel model = new IntegerModel(max);
 		
 		double bits = 0.0;
 		for(int symbol : sequence)
@@ -185,27 +154,7 @@ public class OnlineModel<T> extends FrequencyModel<T>
 		return bits;
 	}
 
-	/**
-	 * Returns the number of bits required to store the given sequence.
-	 * 
-	 * Does not include the cost of storing the symbols themselves or the length
-	 * of the sequence.
-	 * 
-	 * @param sequence
-	 * @return
-	 */
-	public static <L> double storeSequence(List<L> sequence)
-	{
-		Set<L> symbols = new LinkedHashSet<L>(sequence);
-		
-		OnlineModel<L> model = new OnlineModel<L>(symbols);
-		
-		double bits = 0.0;
-		for(L symbol : sequence)
-			bits += - log2(model.observe(symbol)); 
-		
-		return bits;
-	}
+	
 	
 	/**
 	 * The cost of storing the given sequence under the maximum likelihood model:
@@ -214,13 +163,13 @@ public class OnlineModel<T> extends FrequencyModel<T>
 	 * @param sequence
 	 * @return
 	 */
-	public static <L> double storeSequenceML(List<L> sequence)
+	public static double storeML(List<Integer> sequence)
 	{
 		
-		FrequencyModel<L> model = new FrequencyModel<L>(sequence);
+		FrequencyModel<Integer> model = new FrequencyModel<Integer>(sequence);
 
 		double bits = 0.0;
-		for(L symbol : sequence)
+		for(Integer symbol : sequence)
 			bits += -Functions.log2(model.probability(symbol));
 		
 		return bits;

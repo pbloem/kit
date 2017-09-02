@@ -60,6 +60,9 @@ public class Point
 	}	
 	
 	/**
+	 * Constructs a Point from a given vector. The resulting point is 
+	 * independent of the input.
+	 * 
 	 * @param values
 	 */
 	public Point(RealVector values)

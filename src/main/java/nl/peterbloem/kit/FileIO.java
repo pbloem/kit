@@ -23,7 +23,7 @@ import org.apache.commons.io.FileUtils;
 public class FileIO {
 
 	/**
-	 * runs a python script from the resources in the given directory.
+	 * Runs a python script from the resources in the given directory.
 	 * 
 	 * @param dir
 	 * @param name

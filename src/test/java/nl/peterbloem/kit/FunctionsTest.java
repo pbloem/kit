@@ -1,9 +1,11 @@
 package nl.peterbloem.kit;
 
+import static nl.peterbloem.kit.Functions.exp2;
 import static nl.peterbloem.kit.Functions.log2;
 import static nl.peterbloem.kit.Functions.log2Min;
 import static nl.peterbloem.kit.Functions.log2Sum;
 import static nl.peterbloem.kit.Functions.logMin;
+import static nl.peterbloem.kit.Functions.prefixNeg;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
@@ -53,5 +55,45 @@ public class FunctionsTest
 		}
 		
 	}
+	
+	@Test
+	public void testTic() throws InterruptedException
+	{
+		double t0 = System.currentTimeMillis();
+		Functions.tic();
+		
+		Thread.sleep(2000);
+		
+		double t = System.currentTimeMillis();
+		assertEquals(2.0, (t - t0)/1000.0, 0.1); 
+		assertEquals(2.0, Functions.toc(), 0.1); 
+	}
+	
+	@Test
+	public void testPow() 
+	{
+		assertEquals(25, Functions.pow(5, 2));
+		assertEquals(32768, Functions.pow(2, 15));
 
+	}
+	
+	@Test
+	public void testPrefix() 
+	{
+		double prob;
+		
+		prob = 0.0;
+		for(int n : Series.series(1000000))
+			prob += exp2(-Functions.prefix(n));
+		
+		System.out.println(prob);
+		assertEquals(1.0, prob, 0.0001);
+		
+		prob = 0.0;
+		for(int n : Series.series(-1000000, 1000000))
+			prob += exp2(-prefixNeg(n));
+		
+		System.out.println(prob);
+		assertEquals(1.0, prob, 0.0001);
+	}
 }

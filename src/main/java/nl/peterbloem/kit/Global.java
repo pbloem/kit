@@ -51,14 +51,15 @@ public class Global
 	 * Gives the RNG a random seed (based on a reasonable source of randomness,
 	 * such as time). This makes the code non-deterministic and non-repeatable.
 	 * 
-	 *  The chosen seed is returned so that it can be stored/printef, and a run 
-	 *  of some program can be repeated deterministically, if it proves to be 
-	 *  interesting. 
-	 *  
+	 * The chosen seed is returned so that it can be stored/printed, and a run 
+	 * of some program can be repeated deterministically, if it proves to be 
+	 * interesting. The seed is also written to the info logger.
 	 */
 	public static long randomSeed()
 	{
 		long seed = new Random().nextLong(); 
+		
+		log().info("New seed: " + seed);
 		setSeed(seed);
 		
 		return seed;

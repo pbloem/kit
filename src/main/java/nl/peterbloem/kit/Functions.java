@@ -6,7 +6,6 @@ import static java.lang.Math.floor;
 import static java.lang.Math.log;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
-import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 import static nl.peterbloem.kit.Series.series;
 import static org.apache.commons.math3.util.ArithmeticUtils.binomialCoefficientLog;
@@ -285,6 +284,27 @@ public class Functions
 		ticTime.set(System.nanoTime());
 	}
 	
+	/**
+	 * Returns a readable string representing how long the given time interval is:
+	 * ie "3h 45m 9s"
+	 * @param seconds
+	 */
+	public static String timeString(double inSeconds)
+	{
+		long is = (long)inSeconds;
+		long hours = is / 3600;
+		long minutes = (is % 3600) / 60;
+		long seconds = (is % 3600) % 60;
+		
+		if(hours != 0)
+			return hours +"h " + minutes + "m " + seconds + "s";
+		
+		if(minutes != 0)
+			return minutes + "m " + seconds + "s";
+		
+		return seconds + "s";
+	}
+	
 	/** 
 	 * Returns the number of seconds since tic was last called. <br/>
 	 * <br/>
@@ -298,7 +318,7 @@ public class Functions
 	{
 		if(ticTime.get()  == null)
 			throw new IllegalStateException("Tic has not been called yet");
-		return (System.nanoTime() - ticTime.get()) * 10E-9;
+		return (System.nanoTime() - ticTime.get()) * 1E-9;
 	}
 
 	/**
@@ -627,6 +647,14 @@ public class Functions
 		return result;
 	}
 	
+	/**
+	 * Samples k distinct values from the first 'size' natural numbers
+	 * 
+	 * @param k The number of natural numbers to return
+	 * @param size The maximum integer possible + 1
+	 * @return A uniform random choice from all sets of size k of distinct 
+	 * 	integers below the 'size' parameter. The result is not sorted.
+	 */
 	public static List<Integer> sampleInts(int k, int size)
 	{
 		if(0 > k || k > size)
@@ -788,7 +816,7 @@ public class Functions
 		
 		double sum = 0.0;
 		for(double v : values)
-			sum += pow(base, v - max);
+			sum += Math.pow(base, v - max);
 		
 		return log(sum, base) + max;
 	}
@@ -801,7 +829,7 @@ public class Functions
 		
 		double sum = 0.0;
 		for(double v : values)
-			sum += pow(base, v - max);
+			sum += Math.pow(base, v - max);
 		
 		return log(sum, base) + max;
 	}
@@ -813,7 +841,7 @@ public class Functions
 		
 		double max = Math.max(a, b);
 		
-		return log(pow(base, a-max) - pow(base, b-max), base) + max;
+		return log(Math.pow(base, a-max) - Math.pow(base, b-max), base) + max;
 	}
 	
 	public static double log2Sum(List<Double> values)
@@ -938,6 +966,17 @@ public class Functions
 				max = value;
 		
 		return max;
+	}
+	
+	public static <L extends Comparable<L>> L min(Collection<L> values)
+	{
+		L min = null;
+		
+		for(L value : values)
+			if(min == null || value.compareTo(min) < 0)
+				min = value;
+		
+		return min;
 	}
 	
 	public static void dot(int i, int total)
@@ -1121,10 +1160,27 @@ public class Functions
 
 	public static double prefix(long n)
 	{
+		assert(n >= 0);
 		double prob = 1.0/ ((n + 1.0)*(n + 2.0));
 		return - log2(prob);
 	}
 
+	/**
+	 * Prefix code for positive and negative integers.
+	 * 
+	 * Used one bits to encode positive of negative (with the one's complement 
+	 * trick to reclaim the -0 codeword) 
+	 * 
+	 * @param n
+	 * @return
+	 */
+	public static double prefixNeg(long n)
+	{
+		if(n <= 0)
+			return 1.0 + prefix(Math.abs(n));
+		return 1.0 + prefix(n - 1);
+	}	
+	
 	/**
 	 * Finds the solutions to a quadratic polynomial.
 	 * @param sa
@@ -1196,6 +1252,9 @@ public class Functions
      * if the values have equal order, the elements are sorted by the first list 
      * that contains elements comparable to one another. This behavior is 
      * ill-defined due to problems with generics. 
+     * 
+     * Note that the same list should not occur in the arguments multiple times,
+     * or the results will be ill-defined.
      *
      * @param things
      * @param values
@@ -1313,4 +1372,51 @@ public class Functions
     	
     	return res;
     } 
+    
+    /**
+     * Efficient integer exponentiation
+     * 
+     * Source: http://stackoverflow.com/questions/101439/the-most-efficient-way-to-implement-an-integer-based-power-function-powint-int
+     * 
+     * Does not work with negative exponents, does not check for overflow.
+     * 
+     * @param base
+     * @param exp
+     * @return
+     */
+	public static int pow(int base, int exp)
+	{
+	    int result = 1;
+	    while (exp > 0)
+	    {
+	        if ((exp & 1) > 0)
+	            result *= base;
+	        exp >>= 1;
+	        base *= base;
+	    }
+
+	    return result;
+	}
+	
+	/**
+	 * Places the elemens of the given iterable in a list.
+	 * 
+	 * Always returns a copy of the input, that is independent of the given
+	 * iterable.
+	 * 
+	 * @param it
+	 * @return
+	 */
+	public static <T> List<T> list(Iterable<T> it)
+	{
+		if(it instanceof Collection<?>)
+			return new ArrayList<>((Collection<T>)it);
+			
+		ArrayList<T> result = new ArrayList<>();
+		for(T t : it)
+			result.add(t);
+			
+		result.trimToSize();
+		return result;
+	}
 }
