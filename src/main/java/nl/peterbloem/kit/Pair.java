@@ -39,8 +39,9 @@ public class Pair<A, B> implements Serializable
 			Pair<?, ?> pair2 = (Pair) obj;
 			
 			return (
-				first == null ? pair2.first == null : first.equals(pair2.first) && 
-				second == null ? pair2.second == null : second.equals(pair2.second)
+				(first == null ? pair2.first == null : first.equals(pair2.first))
+				&& 
+				(second == null ? pair2.second == null : second.equals(pair2.second))
 				);
 		}
 

@@ -567,6 +567,16 @@ public class Functions
 		out.close();
 	}
 	
+	/**
+	 * Modulo. Java's % returns the remainder, which is different from the 
+	 * modulus for negative numbers. This function always return a result in the 
+	 * range [0 .. range-1] (inclusive).  
+	 * 
+	 * @deprecated Use Math.floorMod
+	 * @param x
+	 * @param range
+	 * @return
+	 */
 	public static int mod(int x, int range)
 	{
 		int r = x % range;
@@ -979,6 +989,16 @@ public class Functions
 		return min;
 	}
 	
+	/**
+	 * Prints a dot to the output stream if i is equal to one of 100 integers 
+	 * spaced (roughly) equally between o and total.
+	 * 
+	 * In other words, calling this function once every iteration gives you a 
+	 * kind of provisional progress bar in the command line.
+	 * 
+	 * @param i
+	 * @param total
+	 */
 	public static void dot(int i, int total)
 	{
 		if(i == total - 1)
@@ -989,7 +1009,7 @@ public class Functions
 			System.out.print('.');
 	}
 	
-	   /**
+	/**
      * Test if n is a perfect square (ie. its square root is an integer).
      * 
      * Code from http://stackoverflow.com/questions/295579/fastest-way-to-determine-if-an-integers-square-root-is-an-integer
