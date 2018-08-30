@@ -1188,7 +1188,7 @@ public class Functions
 	/**
 	 * Prefix code for positive and negative integers.
 	 * 
-	 * Used one bits to encode positive of negative (with the one's complement 
+	 * Uses one bit to encode positive of negative (with the one's complement 
 	 * trick to reclaim the -0 codeword) 
 	 * 
 	 * @param n

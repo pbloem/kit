@@ -167,9 +167,13 @@ public class PitmanYorModel<T> extends FrequencyModel<T>
 		double bits = 0.0;
 
 		ArrayList<Integer> members = new ArrayList<>(new LinkedHashSet<>(sequence));
+		
+		// * Store the ordering of the members 
+		bits += Functions.log2Factorial(members.size()); 
+		
 		Collections.sort(members);
 		
-		// * Store the dimensions
+		// * Store the specific members (in order)
 		// bits += prefix(sequence.size());
 		bits += prefix(members.size());
 		// * store the members
@@ -199,16 +203,35 @@ public class PitmanYorModel<T> extends FrequencyModel<T>
 		double preamble = 0.0;
 
 		ArrayList<Integer> members = new ArrayList<>(new LinkedHashSet<>(sequence));
-		Collections.sort(members);
+		
+		// * Store the ordering of the members 
+		// System.out.println("ORDERING " + Functions.log2Factorial(members.size()));
+		// preamble += Functions.log2Factorial(members.size());
+		
+		// Collections.sort(members); // cheating
+		// Collections.shuffle(members);
 		
 		// * Store the dimensions
 		// bits += prefix(sequence.size());
 		preamble += prefix(members.size());
 		// * store the members
 		preamble += prefixNeg(members.get(0));
+//		int min = Functions.min(members), max = Functions.max(members);
+//		int range = max - min;
+//		
+//		preamble += prefixNeg((int)Functions.min(members));
+//		preamble += prefixNeg((int)Functions.max(members));
+		
 		for(int i : Series.series(1, members.size()))
-			preamble += prefix(members.get(i) - members.get(i - 1)); 
-				
+			preamble += prefixNeg(members.get(i) - members.get(i - 1)); 
+//			// preamble += prefixNeg(members.get(i));
+//			preamble += Functions.log2(range);
+		
+//		if(range > 0)
+//			preamble += Functions.log2(range) * members.size();
+		
+		System.out.println("Preamble " + preamble);
+		
 		double shortest = Double.POSITIVE_INFINITY;
 		for(double alpha : Series.series(1/16.0, 1/16.0, 1.0))
 			for(double d : Series.series(0.0, 1/16.0, 1.0))

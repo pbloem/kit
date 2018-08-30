@@ -59,7 +59,7 @@ public class Global
 	{
 		long seed = new Random().nextLong(); 
 		
-		log().info("New seed: " + seed);
+		info("New seed: " + seed);
 		setSeed(seed);
 		
 		return seed;
@@ -75,6 +75,16 @@ public class Global
 	 * @return
 	 */
 	public static Logger log() { return Logger.getLogger(Logger.GLOBAL_LOGGER_NAME); }
+	
+	/**
+	 * Logs the given message to INFO.
+	 * @param msg
+	 * @return
+	 */
+	public static void info(String msg) { 
+		log().info(msg);
+	}
+
 	
 	private static int numThreads = Runtime.getRuntime().availableProcessors();
 	
