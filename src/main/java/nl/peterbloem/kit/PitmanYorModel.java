@@ -229,9 +229,7 @@ public class PitmanYorModel<T> extends FrequencyModel<T>
 		
 //		if(range > 0)
 //			preamble += Functions.log2(range) * members.size();
-		
-		System.out.println("Preamble " + preamble);
-		
+				
 		double shortest = Double.POSITIVE_INFINITY;
 		for(double alpha : Series.series(1/16.0, 1/16.0, 1.0))
 			for(double d : Series.series(0.0, 1/16.0, 1.0))

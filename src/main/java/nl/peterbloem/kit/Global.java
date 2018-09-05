@@ -84,6 +84,11 @@ public class Global
 	public static void info(String msg) { 
 		log().info(msg);
 	}
+	
+	public static void info(String msg, Object... args) { 
+		String fmt = String.format(msg, args);
+		log().info(fmt);
+	}
 
 	
 	private static int numThreads = Runtime.getRuntime().availableProcessors();

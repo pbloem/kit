@@ -284,6 +284,22 @@ public class Functions
 		ticTime.set(System.nanoTime());
 	}
 	
+	/** 
+	 * Returns the number of seconds since tic was last called. <br/>
+	 * <br/>
+	 * The behavior of tic()/toc() is thread-local, so different threads
+	 * can call this function simultaneously.
+	 * 
+	 * @return A double representing the number of seconds since the last call 
+	 *         to tic(). 
+	 */
+	public static double toc()
+	{
+		if(ticTime.get()  == null)
+			throw new IllegalStateException("Tic has not been called yet");
+		return (System.nanoTime() - ticTime.get()) * 1E-9;
+	}
+
 	/**
 	 * Returns a readable string representing how long the given time interval is:
 	 * ie "3h 45m 9s"
@@ -305,22 +321,6 @@ public class Functions
 		return seconds + "s";
 	}
 	
-	/** 
-	 * Returns the number of seconds since tic was last called. <br/>
-	 * <br/>
-	 * The behavior of tic()/toc() is thread-local, so different threads
-	 * can call this function simultaneously.
-	 * 
-	 * @return A double representing the number of seconds since the last call 
-	 *         to tic(). 
-	 */
-	public static double toc()
-	{
-		if(ticTime.get()  == null)
-			throw new IllegalStateException("Tic has not been called yet");
-		return (System.nanoTime() - ticTime.get()) * 1E-9;
-	}
-
 	/**
 	 *  2 log
 	 */
